@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { ShieldAlert, LogOut, LayoutDashboard, FileText, Users } from "lucide-react";
 
 export default async function Navbar() {
-  const session = await auth();
+  const session = null as any; // mock session for edge debugging
 
   return (
     <nav className="border-b border-slate-200 bg-white shadow-sm sticky top-0 z-50">
