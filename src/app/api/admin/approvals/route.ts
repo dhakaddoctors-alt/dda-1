@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
+import type { Session } from "next-auth";
 import { auth } from "@/auth";
 import { approveMember } from "@/lib/members";
 
 export const runtime = "edge";
 
 export async function POST(request: Request) {
-  let session: Awaited<ReturnType<typeof auth>> | null = null;
+  let session: Session | null = null;
 
   try {
-    session = await auth();
+    session = (await auth()) as Session | null;
   } catch {
     session = null;
   }

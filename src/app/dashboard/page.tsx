@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import type { Session } from "next-auth";
 import { redirect } from "next/navigation";
 import { FileText, Download, LayoutDashboard, Shield, Activity, Share2 } from "lucide-react";
 import { getMemberForUser, listPendingMembers } from "@/lib/members";
@@ -7,10 +8,10 @@ import AdminApprovalPanel from "@/components/AdminApprovalPanel";
 export const runtime = "edge";
 
 export default async function Dashboard() {
-  let session: Awaited<ReturnType<typeof auth>> | null = null;
+  let session: Session | null = null;
 
   try {
-    session = await auth();
+    session = (await auth()) as Session | null;
   } catch {
     session = null;
   }
