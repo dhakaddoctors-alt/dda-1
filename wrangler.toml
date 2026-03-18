@@ -1,0 +1,14 @@
+name = "ddacloudflare"
+compatibility_date = "2024-04-05"
+compatibility_flags = ["nodejs_compat"]
+
+[site]
+bucket = ".vercel/output/static"
+[[d1_databases]]
+binding = "DB"
+database_name = "dda-1"
+database_id = "89e6d1f7-31a9-41af-b272-f5068c49e705"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "dda-files"
