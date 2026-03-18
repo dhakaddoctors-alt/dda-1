@@ -7,12 +7,11 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const nextConfig: NextConfig = {
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
+  serverExternalPackages: ['async_hooks'],
+  turbopack: {
+    resolveAlias: {
       "async_hooks": "node:async_hooks",
-    };
-    return config;
+    },
   },
 };
 
