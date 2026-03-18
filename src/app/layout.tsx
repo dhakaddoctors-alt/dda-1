@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: "DDA Portal | Member Network",
   description: "Dynamic Registration and Interactive Member Directory",
