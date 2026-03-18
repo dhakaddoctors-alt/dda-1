@@ -6,6 +6,14 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "async_hooks": "node:async_hooks",
+    };
+    return config;
+  },
+};
 
 export default nextConfig;
