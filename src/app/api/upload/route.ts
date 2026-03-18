@@ -1,9 +1,7 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextRequest, NextResponse } from "next/server";
+import { getCloudflareEnv, toPublicR2Url } from "@/lib/cloudflare";
 
 export const runtime = 'edge';
-
-type UploadEnv = CloudflareEnv;
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const env = getRequestContext().env as UploadEnv;
+    const env = getCloudflareEnv();
     const bucket = env.R2;
     
     if (!bucket) {
@@ -31,8 +29,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Replace with your actual R2 public URL
-    const url = `https://pub-your-r2-dev-url.r2.dev/${filename}`;
+    const url = toPublicR2Url(filename);
+    if (!url) {
+      return NextResponse.json(
+        { error: "R2_PUBLIC_URL is not configured." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ url });
   } catch (err) {
