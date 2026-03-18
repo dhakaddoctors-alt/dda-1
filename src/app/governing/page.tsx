@@ -1,4 +1,4 @@
-import { User, Gavel, Calendar, Archive, FileText } from "lucide-react";
+import { User, Gavel, Calendar, FileText } from "lucide-react";
 
 const governingMembers = [
   { name: "Robert Patterson", role: "President", term: "2024 - 2026", contact: "pres@ddaportal.org" },

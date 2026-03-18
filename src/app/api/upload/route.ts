@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = 'edge';
 
+type UploadEnv = CloudflareEnv;
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -12,7 +14,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const env = getRequestContext().env as any;
+    const env = getRequestContext().env as UploadEnv;
     const bucket = env.R2;
     
     if (!bucket) {
@@ -33,7 +35,8 @@ export async function POST(req: NextRequest) {
     const url = `https://pub-your-r2-dev-url.r2.dev/${filename}`;
 
     return NextResponse.json({ url });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Upload failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

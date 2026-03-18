@@ -1,17 +1,37 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { FileText, Download, LayoutDashboard, Shield, Activity, Share2 } from "lucide-react";
+import { getMemberForUser, listPendingMembers } from "@/lib/members";
+import AdminApprovalPanel from "@/components/AdminApprovalPanel";
+
+export const runtime = "edge";
 
 export default async function Dashboard() {
-  const session = await auth();
+  let session: Awaited<ReturnType<typeof auth>> | null = null;
+
+  try {
+    session = await auth();
+  } catch {
+    session = null;
+  }
+
   if (!session?.user) {
     redirect("/api/auth/signin");
   }
 
   const user = session.user;
+  const member = user.id ? await getMemberForUser(user.id) : null;
+  const pendingMembers = user.role === "admin" ? await listPendingMembers() : [];
+  const memberId = member?.registrationNumber ?? `DDA-24-${user.id?.slice(0, 4)?.toUpperCase() || "USER"}`;
+  const memberStatus = member?.isApproved ? "Active" : "Pending Approval";
+  const joinedOn = member?.createdAt ? new Date(member.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }) : null;
 
   return (
-    <div className="max-w-6xl mx-auto w-full pt-6 pb-12">
+    <div className="max-w-6xl mx-auto w-full pt-6 pb-12 space-y-8">
       <div className="mb-10">
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
            <LayoutDashboard className="w-8 h-8 text-blue-600" /> My Dashboard
@@ -46,12 +66,12 @@ export default async function Dashboard() {
                     <div className="grid grid-cols-2 gap-4">
                        <div>
                           <p className="text-xs text-blue-200 uppercase tracking-widest mb-1">Member ID</p>
-                          <p className="font-mono text-sm tracking-widest">DDA-24-{user.id?.slice(0,4)?.toUpperCase() || "ADMIN"}</p>
+                          <p className="font-mono text-sm tracking-widest">{memberId}</p>
                        </div>
                        <div>
                           <p className="text-xs text-blue-200 uppercase tracking-widest mb-1">Status</p>
-                          <p className="text-sm font-semibold text-green-300 flex items-center gap-1.5">
-                             <span className="w-2 h-2 rounded-full bg-green-400"></span> Active
+                          <p className={`text-sm font-semibold flex items-center gap-1.5 ${member?.isApproved ? "text-green-300" : "text-amber-200"}`}>
+                             <span className={`w-2 h-2 rounded-full ${member?.isApproved ? "bg-green-400" : "bg-amber-300"}`}></span> {memberStatus}
                           </p>
                        </div>
                     </div>
@@ -81,9 +101,9 @@ export default async function Dashboard() {
                        <Shield className="w-5 h-5" />
                     </div>
                     <div>
-                       <p className="font-medium text-slate-900">Account Verified</p>
-                       <p className="text-sm text-slate-500 mt-1">Your member profile has been fully verified and approved by administrators.</p>
-                       <p className="text-xs text-slate-400 mt-2 font-medium uppercase tracking-wider">Oct 12, 2024</p>
+                       <p className="font-medium text-slate-900">{member?.isApproved ? "Account Verified" : "Awaiting Approval"}</p>
+                       <p className="text-sm text-slate-500 mt-1">{member?.isApproved ? "Your member profile has been approved by administrators." : "Your registration is saved and waiting for administrator approval."}</p>
+                       <p className="text-xs text-slate-400 mt-2 font-medium uppercase tracking-wider">{joinedOn ?? "Recently created"}</p>
                     </div>
                  </div>
                  <div className="flex gap-4">
@@ -92,14 +112,16 @@ export default async function Dashboard() {
                     </div>
                     <div>
                        <p className="font-medium text-slate-900">Registration Application Submitted</p>
-                       <p className="text-sm text-slate-500 mt-1">You submitted your initial application to join the DDA portal.</p>
-                       <p className="text-xs text-slate-400 mt-2 font-medium uppercase tracking-wider">Oct 10, 2024</p>
+                       <p className="text-sm text-slate-500 mt-1">{member?.address ?? "You submitted your initial application to join the DDA portal."}</p>
+                       <p className="text-xs text-slate-400 mt-2 font-medium uppercase tracking-wider">{member?.organization ?? member?.email ?? "Member record created"}</p>
                     </div>
                  </div>
               </div>
            </div>
         </div>
       </div>
+
+      {user.role === "admin" ? <AdminApprovalPanel members={pendingMembers} /> : null}
     </div>
   );
 }

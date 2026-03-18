@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { ShieldAlert, LogOut, LayoutDashboard, FileText, Users } from "lucide-react";
+import { ShieldAlert, LogOut, LayoutDashboard, Users } from "lucide-react";
 
 export default async function Navbar() {
-  const session = null as any; // mock session for edge debugging
+  let session: Awaited<ReturnType<typeof auth>> | null = null;
+
+  try {
+    session = await auth();
+  } catch {
+    session = null;
+  }
 
   return (
     <nav className="border-b border-slate-200 bg-white shadow-sm sticky top-0 z-50">

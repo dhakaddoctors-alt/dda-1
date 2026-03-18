@@ -8,6 +8,13 @@
       "when": 1773820138722,
       "tag": "0000_crazy_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773859200000,
+      "tag": "0001_member_auth",
+      "breakpoints": true
     }
   ]
 }
